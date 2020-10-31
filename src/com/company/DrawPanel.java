@@ -3,8 +3,10 @@ package com.company;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DrawPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -20,6 +22,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
     private Line axisY = new Line(0, -1, 0, 1);
 
     private ArrayList<Line> allLines = new ArrayList<>();
+    private ArrayList<Triangle> allTriangles = new ArrayList<Triangle>();
+    private Line newLine = null;
+    private ScreenPoint prevPoint = null;
+
 
     @Override
     public void paint(Graphics g) {
@@ -32,40 +38,68 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         gr.dispose();
         PixelDrawer pd = new BufferedImagePixelDrawer(bi);
         LineDrawer ld = new DDALineDrawer(pd);
+        TriangleDrawer td = new DDALineDrawer(pd);
         /**/
-        //  ld.drawLine(sc.r2s(axisX.getP1()), sc.r2s(axisX.getP2()));
-        // ld.drawLine(sc.r2s(axisY.getP1()), sc.r2s(axisY.getP2()));
-        drawAll(ld);
-
+        drawAll(ld, td);
         /**/
         g.drawImage(bi, 0, 0, null);
+
+
     }
 
-    private void drawAll(LineDrawer ld) {
+    private void drawAll(LineDrawer ld, TriangleDrawer td) {
+
         drawLine(ld, axisX);
         drawLine(ld, axisY);
-        for (Line d : allLines)
-            drawLine(ld, d);
-        if (newLine != null) {
-            drawLine(ld, newLine);
+
+        for (Line l : allLines) {
+            drawTriangle( td, l);
         }
+        if (newLine != null) {
+            drawTriangle( td, newLine);
 
-
+        }
     }
+
 
     private void drawLine(LineDrawer ld, Line l) {
         ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
-
     }
 
-    private ScreenPoint prevPoint = null;
+    private void drawTriangle(TriangleDrawer td, Line l) {
+        td.drawTriangle(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
+    }
+
+
+    private void getClickedLine(int x, int y) {
+        int boxX = x - 2;
+        int boxY = y - 2;
+        double width = 2 * boxX;
+        double height = 2 * boxY;
+
+        for (Line selectedLine : allLines) {
+            if (selectedLine.intersects(boxX, boxY, width, height)) {
+                removeLine(selectedLine);
+            }
+        }
+    }
+
+    private void removeLine(Line line) {
+        Iterator<Line> it = allLines.iterator();
+        while (it.hasNext()) {
+            Line selectedLine = it.next();
+            if (selectedLine.equals(line)) {
+                it.remove();
+                repaint();
+            }
+        }
+    }
+
 
     @Override
-    public void mouseClicked(MouseEvent mouseEvent) {
-
+    public void mouseClicked(MouseEvent e) {
+        getClickedLine(e.getX(), e.getY());
     }
-
-    private Line newLine = null;
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -86,8 +120,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
             prevPoint = null;
         } else if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
             allLines.add(newLine);
+            allTriangles.add(new Triangle(newLine.getP1(), newLine.getP2()));
             newLine = null;
         }
+        if (mouseEvent.getButton() == MouseEvent.BUTTON2) {
+            newLine = null;
+            repaint();
+        }
+
     }
 
     @Override

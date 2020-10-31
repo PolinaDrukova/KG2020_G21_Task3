@@ -28,4 +28,11 @@ public class Line {
     public void setP2(RealPoint p2) {
         this.p2 = p2;
     }
+
+    public boolean intersects(double x, double y, double w, double h) {
+        if (x  < w || y  < h) {
+            return true;
+        } else
+            return false;
+    }
 }
