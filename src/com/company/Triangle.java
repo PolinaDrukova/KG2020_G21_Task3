@@ -8,7 +8,7 @@ public class Triangle {
     public Triangle(RealPoint p1, RealPoint p2) {
         this.p1 = p1;
         this.p2 = p2;
-        this.p3 = new RealPoint((p2.getX() + p1.getX()) / 2, (Math.sqrt(2) / 3) * (p2.getY() - p1.getY()));
+        this.p3 = new RealPoint((p2.getX() + p1.getX()) / 2, (Math.sqrt(3) / 2) * (p2.getY() - p1.getY()));
 
 
     }
@@ -17,7 +17,7 @@ public class Triangle {
 
         this.p1 = new RealPoint(x1, y1);
         this.p2 = new RealPoint(x2, y2);
-        this.p3 = new RealPoint((x2 + x1) / 2, (Math.sqrt(2) / 3) * (y2 - y1));
+        this.p3 = new RealPoint((x2 + x1) / 2, (Math.sqrt(3) / 2) * (y2 - y1));
     }
 
     public RealPoint getP1() {
