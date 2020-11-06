@@ -1,4 +1,4 @@
-package com.company;
+package com.company.point;
 
 public class ScreenPoint {
     private int x, y;
@@ -7,6 +7,7 @@ public class ScreenPoint {
         this.x = x;
         this.y = y;
     }
+
     public int getX() {
         return x;
     }

@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.point.RealPoint;
+
 public class Line {
     private RealPoint p1, p2;
 
@@ -29,10 +31,4 @@ public class Line {
         this.p2 = p2;
     }
 
-    public boolean intersects(double x, double y, double w, double h) {
-        if (x  < w || y  < h) {
-            return true;
-        } else
-            return false;
-    }
 }

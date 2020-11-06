@@ -1,9 +1,11 @@
-package com.company;
+package com.company.line_drawer;
+
+import com.company.pixel_drawer.PixelDrawer;
+import com.company.point.ScreenPoint;
 
 import java.awt.*;
-import java.util.ArrayList;
 
-public class DDALineDrawer implements LineDrawer, TriangleDrawer {
+public class DDALineDrawer implements LineDrawer {
     private PixelDrawer pd;
 
     public DDALineDrawer(PixelDrawer pd) {
@@ -50,14 +52,6 @@ public class DDALineDrawer implements LineDrawer, TriangleDrawer {
             }
         }
 
-    }
-
-
-    @Override
-    public void drawTriangle(ScreenPoint p1, ScreenPoint p2) {
-        drawLine(p1, p2);
-        drawLine(p2, new ScreenPoint((p2.getX() + p1.getX()) / 2, (int)(Math.sqrt(3)/2)*(p2.getY() - p1.getY()) ));
-        drawLine(new ScreenPoint((p2.getX() + p1.getX()) / 2, (int)(Math.sqrt(3)/2)*(p2.getX() - p1.getY()) ), p1);
     }
 }
 

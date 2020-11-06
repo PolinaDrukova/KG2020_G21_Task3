@@ -1,5 +1,9 @@
 package com.company;
 
+import com.company.Triangle.TriangleDrawer;
+import com.company.point.RealPoint;
+import com.company.point.ScreenPoint;
+
 public class ScreenConverter {
     private double xR, yR, wR, hR;
     private int wS, hS;
@@ -72,5 +76,6 @@ public class ScreenConverter {
     public void sethS(int hS) {
         this.hS = hS;
     }
+
 
 }

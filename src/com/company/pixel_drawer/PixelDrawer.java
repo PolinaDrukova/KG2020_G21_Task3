@@ -1,4 +1,4 @@
-package com.company;
+package com.company.pixel_drawer;
 import java.awt.*;
 
 public interface PixelDrawer {
