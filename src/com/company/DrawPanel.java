@@ -16,8 +16,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.awt.event.KeyEvent.VK_BACK_SPACE;
-import static java.awt.event.KeyEvent.VK_DELETE;
 
 public class DrawPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, IFigure {
 
@@ -92,6 +90,13 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
+    private void clean() {
+        int i = 0;
+        while (triangles.size() != 0) {
+            triangles.remove(i);
+            i++;
+        }
+    }
 
     private void drawLastSide(LineDrawer ld) {
         if (triangles.size() > 0 && !complete) {
@@ -136,23 +141,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
             x = mouseEvent.getX();
             y = mouseEvent.getY();
-            if (changePoint != null) {
-                if (!(Math.abs(x - changePoint.getX()) < radius && Math.abs(y - changePoint.getY()) < radius)) {
-                    RealPoint p = sc.s2r(new ScreenPoint(x, y));
-                    changePoint.setX(p.getX());
-                    changePoint.setY(p.getX());
-                }
-                changePoint = null;
-            } else if (complete) {
-                changePoint = nearMarker(x, y);
-                if (changePoint == null) {
-                    triangles.add(new Triangle());
-                    x0 = x;
-                    y0 = y;
-                    RealPoint p = sc.s2r(new ScreenPoint(x, y));
-                    triangles.get(triangles.size() - 1).addPoint(p);
-                    complete = false;
-                }
+            if (complete) {
+                triangles.add(new Triangle());
+                x0 = x;
+                y0 = y;
+                RealPoint p = sc.s2r(new ScreenPoint(x, y));
+                triangles.get(triangles.size() - 1).addPoint(p);
+                complete = false;
+                //  }
             } else {
                 if (Math.abs(x - x0) < radius && Math.abs(y - y0) < radius) {
                     complete = true;
@@ -169,13 +165,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         } else {
             if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //размер списка треугольников = 2, вызвать метод сборки новой фигуры
                 if ((triangles.size() == 2) && (triangles.get(0).getList().size() == 3) && (triangles.get(1).getList().size() == 3)) {
-                    Triangle f = new Triangle(TriangleDrawer.pointsOfNewPolygon(triangles.get(0), triangles.get(1)));
-                    triangles.add(f);
+                        Triangle f = new Triangle(TriangleDrawer.pointsOfNewPolygon(triangles.get(0), triangles.get(1)));
+                        triangles.add(f);
+                        triangles.remove(1);
+                        triangles.remove(0);
+                        repaint();
+
                 }
                 repaint();
             }
         }
-
 
     }
 
