@@ -1,35 +1,64 @@
 package com.company.Triangle;
 
+import com.company.Line;
+import com.company.line_drawer.BrezenhamCircleDrawer;
+import com.company.line_drawer.CircleDrawer;
 import com.company.line_drawer.LineDrawer;
 import com.company.point.RealPoint;
 import com.company.ScreenConverter;
 import com.company.point.ScreenPoint;
+import com.sun.org.apache.xerces.internal.xinclude.XPointerElementHandler;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 
 public class TriangleDrawer {
 
-    public static void draw(ScreenConverter sc, LineDrawer ld, Triangle t) {//две стороны треугольника, complete = false
+    public static void draw(ScreenConverter sc, LineDrawer ld, Triangle t, CircleDrawer cd) {//две стороны треугольника, complete = false
         RealPoint prev = null;
         for (RealPoint p : t.getList()) {
             if (prev != null) {
                 ScreenPoint p1 = sc.r2s(prev);
                 ScreenPoint p2 = sc.r2s(p);
-                ld.drawLine(p1, p2);
+                ld.drawLine(p1, p2, Color.BLUE);
+                cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
             }
             prev = p;
+
         }
     }
 
-    public static void drawFinal(ScreenConverter sc, LineDrawer ld, Triangle t) {//завершенный треугольник, complete = true
-        draw(sc, ld, t);
+    public static void drawFinal(ScreenConverter sc, LineDrawer ld, Triangle t, CircleDrawer cd) {//завершенный треугольник, complete = true
+        draw(sc, ld, t, cd);
         ScreenPoint p1 = sc.r2s(t.getList().get(t.getList().size() - 1));
         ScreenPoint p2 = sc.r2s(t.getList().get(0));
-        ld.drawLine(p1, p2);
+        ld.drawLine(p1, p2, Color.BLUE);
+        cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
     }
+
+    /*public static void drawFigure(ScreenConverter sc, LineDrawer ld, Triangle t) {//две стороны треугольника, complete = false
+        RealPoint prev = null;
+        for (RealPoint p : t.getList()) {
+            if (prev != null) {
+                ScreenPoint p1 = sc.r2s(prev);
+                ScreenPoint p2 = sc.r2s(p);
+                ld.drawLine(p1, p2, Color.RED);
+            }
+            prev = p;
+
+        }
+    }
+
+    public static void drawFinalFigure(ScreenConverter sc, LineDrawer ld, Triangle t) {//завершенный треугольник, complete = true
+        drawFigure(sc, ld, t);
+        ScreenPoint p1 = sc.r2s(t.getList().get(t.getList().size() - 1));
+        ScreenPoint p2 = sc.r2s(t.getList().get(0));
+        ld.drawLine(p1, p2, Color.RED);
+    }
+
+     */
 
 
     private static boolean isBelongs(Triangle t, RealPoint p) {//принадлежит ли точка треугольнику
@@ -54,88 +83,114 @@ public class TriangleDrawer {
         return result;
     }
 
+    private static RealPoint getCrossingPoint(Line l1, Line l2) { //поиск точки пересечения 2 линий
+        double x1 = l1.getP1().getX();
+        double y1 = l1.getP1().getY();
+        double x2 = l1.getP2().getX();
+        double y2 = l1.getP2().getY();
+        double x3 = l2.getP1().getX();
+        double y3 = l2.getP1().getY();
+        double x4 = l2.getP2().getX();
+        double y4 = l2.getP2().getY();
 
-    private static RealPoint getCrossingPoint(List<RealPoint> points) {//точка пересечения двух сторон
-        double a1 = points.get(0).getY() - points.get(1).getY();
-        double b1 = points.get(1).getX() - points.get(0).getX();
-        double a2 = points.get(2).getY() - points.get(3).getY();
-        double b2 = points.get(3).getX() - points.get(2).getX();
+        if ((x1 == x3) && (y1 == y3) || (x1 == x4) && (y1 == y4) || (x2 == x3) && (y2 == y3) || (x2 == x4) && (y2 == y4)) {
+            return null;
+        } else {
 
-        double d = a1 * b2 - a2 * b1;
-        if (d != 0) {
-            double c1 = points.get(1).getY() * points.get(0).getX() - points.get(1).getX() * points.get(0).getY();
-            double c2 = points.get(3).getY() * points.get(2).getX() - points.get(3).getX() * points.get(2).getY();
+            double a1 = y2 - y1;
+            double b1 = x1 - x2;
+            double c1 = (-x1 * y2 + y1 * x2);
 
-            double xi = (int) (b1 * c2 - b2 * c1) / d;
-            double yi = (int) (a2 * c1 - a1 * c2) / d;
-            return new RealPoint(xi, yi);
+            double a2 = y4 - y3;
+            double b2 = x3 - x4;
+            double c2 = (-x3 * y4 + y3 * x4);
+
+            double x = (b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
+            double y = (a2 * c1 - a1 * c2) / (a1 * b2 - a2 * b1);
+
+            if (((x1 < x) && (x2 > x) && (x3 < x) && (x4 > x)) || ((y1 < y) && (y2 > y) && (y3 < y) && (y4 > y))) {
+                return new RealPoint(x, y);
+            } else {
+                return null;
+            }
         }
-        return null;
     }
 
+    private static boolean belongLine(Line l, RealPoint p1) {//принадлежит ли точка линии
+        if ((l.getP1().getX() < p1.getX()) && (l.getP1().getY() < p1.getY())
+                &&
+                (l.getP2().getX() > p1.getX()) && (l.getP2().getY() > p1.getY())) {
+            return true;
+        }
+        return false;
 
-   /*виды взаимодействия треугольников:
-    1) один в другом
-    если все точки 1 треугольника принадлежат 2 ,то удалить точки 1 и наоборот
-    2) не соприкасаются
-    если хотя бы одна точка 1 не принадлежит 2, то ничего не делать и наоборот ))
-    3)пересекаются
-    если хотя бы одна точка 1 треугольника принадлежит 2(то бишь лежит внутри него)
-    удалить точку и найти 2 новые точки пересечения
-     и наоборот
-
-     не забывать сортировать точки
-    */
+    }
 
     public static List<RealPoint> pointsOfNewPolygon(Triangle t1, Triangle t2) {
-        List<RealPoint> points1 = new ArrayList<>();
-        List<RealPoint> p = new ArrayList<>();
-        Triangle st1 = t1.getSortTriangle(t1);
-       Triangle st2 = t2.getSortTriangle(t2);
+        List<RealPoint> finalPoints = new ArrayList<>();
 
-        for (int i = 0; i < 3; i++) {
-            points1.add(t1.getList().get(i));
-        }
-        for (int i = 0; i < 3; i++) {
-            points1.add(t2.getList().get(i));
-        }
-       getSortPoint(points1);
+        RealPoint a1 = t1.getList().get(0);
+        RealPoint a2 = t1.getList().get(1);
+        RealPoint a3 = t1.getList().get(2);
+        RealPoint b1 = t2.getList().get(0);
+        RealPoint b2 = t2.getList().get(1);
+        RealPoint b3 = t2.getList().get(2);
 
-        if (isBelongs(st1, st2.getList().get(0)) && isBelongs(st1, st2.getList().get(1)) && isBelongs(st1, st2.getList().get(2))) {
-            for (int i = 0; i < points1.size(); i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (points1.get(i) == st2.getList().get(j)) {
-                        points1.remove(points1.get(i));
-                    }
-                }
+        List<RealPoint> p = new ArrayList<>(Arrays.asList(a1, a2, a3, b1, b2, b3));
+
+        Line l1t1 = new Line(a1, a2);
+        Line l2t1 = new Line(a1, a3);
+        Line l3t1 = new Line(a2, a3);
+        List<Line> linesT1 = new ArrayList<>(Arrays.asList(l1t1, l2t1, l3t1));
+
+        Line l1t2 = new Line(b1, b2);
+        Line l2t2 = new Line(b1, b3);
+        Line l3t2 = new Line(b2, b3);
+        List<Line> linesT2 = new ArrayList<>(Arrays.asList(l1t2, l2t2, l3t2));
+
+
+   /*     if ((isBelongs(t2, a1)) && (isBelongs(t2, a2)) && (isBelongs(t2, a3))) {
+            finalPoints.add(a1);
+            finalPoints.add(a2);
+            finalPoints.add(a3);
+        } else {
+            if ((isBelongs(t1, b1)) && (isBelongs(t1, b2)) && (isBelongs(t1, b3))) {
+                finalPoints.add(b1);
+                finalPoints.add(b2);
+                finalPoints.add(b3);
             }
         }
 
-        if (isBelongs(st2, st1.getList().get(0)) && isBelongs(st2, st1.getList().get(1)) && isBelongs(st2, st1.getList().get(2))) {
-            for (int i = 0; i < points1.size(); i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (points1.get(i) == st1.getList().get(j)) {
-                        points1.remove(points1.get(i));
-                    }
+    */
+
+        if (isBelongs(t2, a1)) {
+            if (isBelongs(t2, a2)) {
+                if (isBelongs(t2, a3)) {
+                    finalPoints.add(a1);
+                    finalPoints.add(a2);
+                    finalPoints.add(a3);
+                } else finalPoints.add(b3);
+            } else finalPoints.add(b2);
+        } else finalPoints.add(b1);
+
+        if (isBelongs(t1, b1)) {
+            if (isBelongs(t1, b2)) {
+                if (isBelongs(t1, b3)) {
+                    finalPoints.add(b1);
+                    finalPoints.add(b2);
+                    finalPoints.add(b3);
+                } else finalPoints.add(a3);
+            } else finalPoints.add(a2);
+        } else finalPoints.add(a1);
+
+        for (int i = 0; i < linesT1.size(); i++) {
+            for (int j = 0; j < linesT2.size(); j++) {
+                if (((getCrossingPoint(linesT1.get(i), linesT2.get(j)) != null))) {
+                    finalPoints.add(getCrossingPoint(linesT1.get(i), linesT2.get(j)));
                 }
             }
         }
-
-
-        if ((points1.size() == 6)) {
-            for (int i = 0; i < 3; i++) {
-                if (isBelongs(st1, st2.getList().get(i))) {
-                    for (int j = 0; j < points1.size(); j++) {
-                        if (points1.get(j) == st2.getList().get(i)) {
-                            p.add(points1.get(j));
-                            points1.remove(points1.get(j));
-                        }
-                    }
-                }
-            }
-        }
-
-        return getSortPoint(points1);
+        return getSortPoint(finalPoints);
 
     }
 
@@ -144,20 +199,6 @@ public class TriangleDrawer {
         ArrayList<RealPoint> points = new ArrayList<>(point);
         points.sort(Comparator.comparingInt(o -> (int) o.getY()));
         return points;
-    }
-
-    public static boolean noChange1(Triangle t1, Triangle t2) {
-        if (!(isBelongs(t1, t2.getList().get(0)) && isBelongs(t1, t2.getList().get(1)) && isBelongs(t1, t2.getList().get(2)))) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean noChange2(Triangle t1, Triangle t2) {
-        if (!(isBelongs(t2, t1.getList().get(0)) && isBelongs(t2, t1.getList().get(1)) && isBelongs(t2, t1.getList().get(2)))) {
-            return true;
-        }
-        return false;
     }
 
 

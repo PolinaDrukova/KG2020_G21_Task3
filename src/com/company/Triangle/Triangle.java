@@ -6,22 +6,12 @@ import java.util.*;
 
 public class Triangle {
     private List<RealPoint> list = new ArrayList<>();
-    private boolean complete = false;
 
     public Triangle(List<RealPoint> list) {
         this.list = list;
-            complete = true;
     }
 
     public Triangle() {
-    }
-
-    public void setComplete(boolean complete) {
-        this.complete = complete;
-    }
-
-    public boolean isComplete() {
-        return complete;
     }
 
     public List<RealPoint> getList() {
