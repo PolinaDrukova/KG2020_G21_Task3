@@ -4,36 +4,21 @@ import com.company.point.RealPoint;
 
 import java.util.*;
 
-public class Triangle {
-    private List<RealPoint> list = new ArrayList<>();
+public class Triangle extends Figure{
 
-    public Triangle(List<RealPoint> list) {
-        this.list = list;
+    public Triangle(RealPoint p1, RealPoint p2, RealPoint p3) {
+        this.addPoint(p1);
+        this.addPoint(p2);
+        this.addPoint(p3);
     }
 
     public Triangle() {
     }
 
-    public List<RealPoint> getList() {
-        return list;
-    }
-
+    @Override
     public void addPoint(RealPoint p) {
-        list.add(p);
-    }
-
-    public Triangle getSortTriangle(Triangle t) {
-        ArrayList<RealPoint> points = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            points.add(t.getList().get(i));
+        if(this.getSize() < 3) {
+            super.addPoint(p);
         }
-        points.sort(new Comparator<RealPoint>() {
-
-            public int compare(RealPoint o1, RealPoint o2) {
-                return Integer.compare((int) o1.getX(), (int) o2.getX());
-            }
-        });
-        return new Triangle(points);
     }
 }
-

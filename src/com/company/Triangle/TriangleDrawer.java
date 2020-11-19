@@ -1,13 +1,12 @@
 package com.company.Triangle;
 
 import com.company.Line;
-import com.company.line_drawer.BrezenhamCircleDrawer;
 import com.company.line_drawer.CircleDrawer;
 import com.company.line_drawer.LineDrawer;
 import com.company.point.RealPoint;
 import com.company.ScreenConverter;
 import com.company.point.ScreenPoint;
-import com.sun.org.apache.xerces.internal.xinclude.XPointerElementHandler;
+
 
 import java.awt.*;
 import java.util.*;
@@ -38,7 +37,7 @@ public class TriangleDrawer {
         cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
     }
 
-    /*public static void drawFigure(ScreenConverter sc, LineDrawer ld, Triangle t) {//две стороны треугольника, complete = false
+    public static void drawFigure(ScreenConverter sc, LineDrawer ld, Figure t) {//две стороны треугольника, complete = false
         RealPoint prev = null;
         for (RealPoint p : t.getList()) {
             if (prev != null) {
@@ -51,14 +50,15 @@ public class TriangleDrawer {
         }
     }
 
-    public static void drawFinalFigure(ScreenConverter sc, LineDrawer ld, Triangle t) {//завершенный треугольник, complete = true
+    public static void drawFinalFigure(ScreenConverter sc, LineDrawer ld, Figure t) {//завершенный треугольник, complete = true
         drawFigure(sc, ld, t);
         ScreenPoint p1 = sc.r2s(t.getList().get(t.getList().size() - 1));
         ScreenPoint p2 = sc.r2s(t.getList().get(0));
         ld.drawLine(p1, p2, Color.RED);
     }
 
-     */
+
+
 
 
     private static boolean isBelongs(Triangle t, RealPoint p) {//принадлежит ли точка треугольнику
@@ -148,30 +148,15 @@ public class TriangleDrawer {
         Line l3t2 = new Line(b2, b3);
         List<Line> linesT2 = new ArrayList<>(Arrays.asList(l1t2, l2t2, l3t2));
 
-
-   /*     if ((isBelongs(t2, a1)) && (isBelongs(t2, a2)) && (isBelongs(t2, a3))) {
-            finalPoints.add(a1);
-            finalPoints.add(a2);
-            finalPoints.add(a3);
-        } else {
-            if ((isBelongs(t1, b1)) && (isBelongs(t1, b2)) && (isBelongs(t1, b3))) {
-                finalPoints.add(b1);
-                finalPoints.add(b2);
-                finalPoints.add(b3);
-            }
-        }
-
-    */
-
         if (isBelongs(t2, a1)) {
             if (isBelongs(t2, a2)) {
                 if (isBelongs(t2, a3)) {
                     finalPoints.add(a1);
                     finalPoints.add(a2);
                     finalPoints.add(a3);
-                } else finalPoints.add(b3);
-            } else finalPoints.add(b2);
-        } else finalPoints.add(b1);
+                }
+            }
+        }
 
         if (isBelongs(t1, b1)) {
             if (isBelongs(t1, b2)) {
@@ -179,27 +164,63 @@ public class TriangleDrawer {
                     finalPoints.add(b1);
                     finalPoints.add(b2);
                     finalPoints.add(b3);
-                } else finalPoints.add(a3);
-            } else finalPoints.add(a2);
-        } else finalPoints.add(a1);
-
-        for (int i = 0; i < linesT1.size(); i++) {
-            for (int j = 0; j < linesT2.size(); j++) {
-                if (((getCrossingPoint(linesT1.get(i), linesT2.get(j)) != null))) {
-                    finalPoints.add(getCrossingPoint(linesT1.get(i), linesT2.get(j)));
                 }
             }
         }
-        return getSortPoint(finalPoints);
+
+        for (int i = 0; i < linesT1.size(); i++) {
+            for (int j = 0; j < linesT2.size(); j++) {
+                if (((getCrossingPoint(linesT1.get(j), linesT2.get(i)) != null))) {
+                    finalPoints.add(getCrossingPoint(linesT1.get(j), linesT2.get(i)));
+                }
+
+            }
+        }
+
+
+        for (int i = 0; i < p.size(); i++) {
+            for (int j = i + 1; j <p.size() ; j++) {
+                if(p.get(i) == p.get(j)){
+                    finalPoints.add(p.get(i));
+                }
+            }
+        }
+        return sortPoints(finalPoints);
 
     }
 
+    public static void sortPointsClockwise(List<RealPoint> points) {
+        float averageX = 0;
+        float averageY = 0;
 
-    public static List<RealPoint> getSortPoint(List<RealPoint> point) {
-        ArrayList<RealPoint> points = new ArrayList<>(point);
-        points.sort(Comparator.comparingInt(o -> (int) o.getY()));
+        for (RealPoint point : points) {
+            averageX += point.getX();
+            averageY += point.getY();
+        }
+
+        final float finalAverageX = averageX / points.size();
+        final float finalAverageY = averageY / points.size();
+
+        Comparator<RealPoint> comparator = new Comparator<RealPoint>() {
+
+            public int compare(RealPoint lhs, RealPoint rhs) {
+                double lhsAngle = Math.atan2(lhs.getY() - finalAverageY, lhs.getX() - finalAverageX);
+                double rhsAngle = Math.atan2(rhs.getY() - finalAverageY, rhs.getX() - finalAverageX);
+
+                // Depending on the coordinate system, you might need to reverse these two conditions
+                if (lhsAngle < rhsAngle) return -1;
+                if (lhsAngle > rhsAngle) return 1;
+
+                return 0;
+            }
+        };
+
+        points.sort(comparator);
+    }
+
+    public static List<RealPoint> sortPoints(List<RealPoint> points) {
+        sortPointsClockwise(points);
+        Collections.reverse(points);
         return points;
     }
-
-
 }
