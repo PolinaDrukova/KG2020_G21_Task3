@@ -37,44 +37,6 @@ public class TriangleDrawer {
         cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
     }
 
-    public static void drawFigure(ScreenConverter sc, LineDrawer ld, Figure t) {//две стороны треугольника, complete = false
-        RealPoint prev = null;
-        for (RealPoint p : t.getList()) {
-            if (prev != null) {
-                ScreenPoint p1 = sc.r2s(prev);
-                ScreenPoint p2 = sc.r2s(p);
-                ld.drawLine(p1, p2, Color.RED);
-            }
-            prev = p;
-
-        }
-    }
-
-
-  /*  private static boolean isBelongs(Triangle t, RealPoint p) {//принадлежит ли точка треугольнику
-        double m, l = 0;
-        double bx, by, cx, cy, px, py;
-        boolean result = false;
-        // переносим треугольник точкой А в (0;0).
-        bx = t.getList().get(1).getX() - t.getList().get(0).getX();
-        by = t.getList().get(1).getY() - t.getList().get(0).getY();
-        cx = t.getList().get(2).getX() - t.getList().get(0).getX();
-        cy = t.getList().get(2).getY() - t.getList().get(0).getY();
-        px = p.getX() - t.getList().get(0).getX();
-        py = p.getY() - t.getList().get(0).getY();
-
-        m = (px * by - bx * py) / (cx * by - bx * cy);
-        if ((m >= 0) && (m <= 1)) {
-            l = (px - m * cx) / bx;
-        }
-        if ((l >= 0) && ((m + l) <= 1)) {
-            result = true;
-        }
-        return result;
-    }
-
-   */
-
     private static boolean isBelongs(Triangle t, RealPoint p) {//принадлежит ли точка треугольнику
         double x1 = t.getList().get(0).getX();
         double y1 = t.getList().get(0).getY();
@@ -90,7 +52,7 @@ public class TriangleDrawer {
         double b = (x2 - x0) * (y3 - y2) - (x3 - x2) * (y2 - y0);
         double c = (x3 - x0) * (y1 - y3) - (x1 - x3) * (y3 - y0);
 
-        if ((a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0)) {
+        if ((a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0)) {//если одинакового знака лежит внутри, если 0 - лежит на стороне
             return true;
         } else {
             return false;
@@ -157,35 +119,6 @@ public class TriangleDrawer {
         return null;
     }
 
-   /* private static RealPoint getCrossingPoint1(Line l1, Line l2) { //поиск точки пересечения 2 линий
-        double x1 = l1.getP1().getX();
-        double y1 = l1.getP1().getY();
-        double x2 = l1.getP2().getX();
-        double y2 = l1.getP2().getY();
-        double x3 = l2.getP1().getX();
-        double y3 = l2.getP1().getY();
-        double x4 = l2.getP2().getX();
-        double y4 = l2.getP2().getY();
-
-        double a1 = y2 - y1;
-        double b1 = x1 - x2;
-        double c1 = (-x1 * y2 + y1 * x2);
-
-        double a2 = y4 - y3;
-        double b2 = x3 - x4;
-        double c2 = (-x3 * y4 + y3 * x4);
-
-        double x = (b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
-        double y = (a2 * c1 - a1 * c2) / (a1 * b2 - a2 * b1);
-
-        if (((x1 < x) && (x2 > x) && (x3 < x) && (x4 > x)) || ((y1 < y) && (y2 > y) && (y3 < y) && (y4 > y))) {
-            return new RealPoint(x, y);
-        } else {
-            return null;
-        }
-    }
-
-    */
 
     public static List<RealPoint> pointsOfNewPolygon(Triangle t1, Triangle t2) {
         List<RealPoint> finalPoints = new ArrayList<>();
@@ -241,9 +174,7 @@ public class TriangleDrawer {
 
                 }
             }
-        }
 
-        if (p1.size() == 3 && p2.size() == 3) {
             for (int i = 0; i < p1.size(); i++) {
                 for (int j = 0; j < p2.size(); j++) {
                     if (p1.get(i) == p2.get(j)) {
@@ -257,7 +188,9 @@ public class TriangleDrawer {
 
     }
 
-    public static void sortPointsClockwise(List<RealPoint> points) {
+    //определяет угол по вектору из усредненной точки на каждую вершину и сортирует по углу
+    public static List<RealPoint> sortPoints(List<RealPoint> points) {
+
         float averageX = 0;
         float averageY = 0;
 
@@ -266,8 +199,8 @@ public class TriangleDrawer {
             averageY += point.getY();
         }
 
-        final float finalAverageX = averageX / points.size();
-        final float finalAverageY = averageY / points.size();
+        float finalAverageX = averageX / points.size();
+        float finalAverageY = averageY / points.size();
 
         Comparator<RealPoint> comparator = new Comparator<RealPoint>() {
 
@@ -283,11 +216,7 @@ public class TriangleDrawer {
         };
 
         points.sort(comparator);
-    }
-
-    public static List<RealPoint> sortPoints(List<RealPoint> points) {
-        sortPointsClockwise(points);
-        Collections.reverse(points);
         return points;
     }
+
 }

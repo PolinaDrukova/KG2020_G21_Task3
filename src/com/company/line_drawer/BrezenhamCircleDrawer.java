@@ -15,7 +15,7 @@ public class BrezenhamCircleDrawer implements CircleDrawer{
     public void drawCircle(int x, int y, int r) {
         int x1 = r;
         int y1 = 0;
-        int radiusError = 1 - x1;
+        int d = 1 - x1;
         while (x1 >= y1) {
             pd.colorPixel(x1 + x + r, y1 + y + r, Color.BLACK);
             pd.colorPixel(y1 + x + r, x1 + y + r, Color.BLACK);
@@ -26,11 +26,11 @@ public class BrezenhamCircleDrawer implements CircleDrawer{
             pd.colorPixel(x1 + x + r, -y1 + y + r, Color.BLACK);
             pd.colorPixel(y1 + x + r, -x1 + y + r, Color.BLACK);
             y1++;
-            if (radiusError < 0) {
-                radiusError += 2 * y1 + 1;
+            if (d < 0) {
+                d += 2 * y1 + 1;
             } else {
                 x1--;
-                radiusError += 2 * (y1 - x1 + 1);
+                d += 2 * (y1 - x1 + 1);
             }
         }
     }

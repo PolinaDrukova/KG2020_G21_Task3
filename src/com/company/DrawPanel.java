@@ -39,7 +39,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
     private int x = 0, y = 0;
     private int x0 = 0, y0 = 0;
-    private int radius = 15;
+    private int radius = 20;
 
     private List<Triangle> triangles = new ArrayList<>();
     private Figure figure = new Figure();
@@ -71,7 +71,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         drawLine(ld, axisY);
 
         drawTriangles(ld, cd);
-        drawLastSide(ld, cd);
+        drawClosingSide(ld, cd);
         setChangeMarker();
 
         drawFigure(ld);
@@ -100,25 +100,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    private void drawFigure(LineDrawer ld) {
-        List<RealPoint> points = figure.getList();
-        for (int i = 0; i < points.size() - 1; i++) {
-            ld.drawLine(sc.r2s(points.get(i)), sc.r2s(points.get(i + 1)), Color.RED);
-            ld.drawLine(sc.r2s(points.get(0)), sc.r2s(points.get(points.size() -1)), Color.RED);
-        }
-
-    }
-
-
-    private void clean() {
-        int i = 0;
-        while (triangles.size() != 0) {
-            triangles.remove(i);
-            i++;
-        }
-    }
-
-    private void drawLastSide(LineDrawer ld, CircleDrawer cd) {
+    private void drawClosingSide(LineDrawer ld, CircleDrawer cd) {
         if (triangles.size() > 0 && !complete) {
             Triangle t = triangles.get(triangles.size() - 1);
             TriangleDrawer.draw(sc, ld, t, cd);
@@ -129,6 +111,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
                 ScreenPoint sp2 = new ScreenPoint(x, y);
                 ld.drawLine(sp, sp2, Color.BLUE);
             }
+        }
+    }
+
+    private void drawFigure(LineDrawer ld) {
+        List<RealPoint> points = figure.getList();
+        for (int i = 0; i < points.size() - 1; i++) {
+            ld.drawLine(sc.r2s(points.get(i)), sc.r2s(points.get(i + 1)), Color.RED);
+            ld.drawLine(sc.r2s(points.get(0)), sc.r2s(points.get(points.size() - 1)), Color.RED);
         }
     }
 
@@ -143,10 +133,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
     public RealPoint nearMarker(int from, int to) {
         for (Triangle t : triangles) {
-            for (RealPoint rp : t.getList()) {
-                ScreenPoint sp = sc.r2s(rp);
+            for (RealPoint realPoint : t.getList()) {
+                ScreenPoint sp = sc.r2s(realPoint);
                 if (Math.abs(from - sp.getX()) < radius && Math.abs(to - sp.getY()) < radius) {
-                    return rp;
+                    return realPoint;
                 }
             }
         }
@@ -179,9 +169,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
             } else {
                 if (Math.abs(x - x0) < radius && Math.abs(y - y0) < radius) {
                     complete = true;
-                    if (triangles.get(triangles.size() - 1).getList().size() < 3) {
-                        triangles.remove(triangles.size() - 1);
-                    }
                 } else {
                     RealPoint p = sc.s2r(new ScreenPoint(x, y));
                     triangles.get(triangles.size() - 1).addPoint(p);
@@ -189,14 +176,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
             }
             repaint();
-//        } else {
-//        /    if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //размер списка треугольников = 2, вызвать метод сборки новой фигуры
-                if ((triangles.size() == 2) && (triangles.get(0).getList().size() == 3) && (triangles.get(1).getList().size() == 3)) {
-                    figure = new Figure(TriangleDrawer.pointsOfNewPolygon(triangles.get(0), triangles.get(1)));
-                }
-                repaint();
+            if ((triangles.size() == 2) && (triangles.get(0).getList().size() == 3) && (triangles.get(1).getList().size() == 3)) {
+                figure = new Figure(TriangleDrawer.pointsOfNewPolygon(triangles.get(0), triangles.get(1)));
             }
-//        }
+            repaint();
+        }
     }
 
 
@@ -204,7 +188,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             if (!complete) {
-                triangles.remove(triangles.size() - 1);
                 complete = true;
             }
             prevPoint = new ScreenPoint(e.getX(), e.getY());
