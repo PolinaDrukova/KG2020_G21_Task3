@@ -104,9 +104,18 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
         List<RealPoint> points = figure.getList();
         for (int i = 0; i < points.size() - 1; i++) {
             ld.drawLine(sc.r2s(points.get(i)), sc.r2s(points.get(i + 1)), Color.RED);
-            ld.drawLine(sc.r2s(points.get(0)), sc.r2s(points.get(points.size() - 1)), Color.RED);
+            ld.drawLine(sc.r2s(points.get(0)), sc.r2s(points.get(points.size() -1)), Color.RED);
         }
 
+    }
+
+
+    private void clean() {
+        int i = 0;
+        while (triangles.size() != 0) {
+            triangles.remove(i);
+            i++;
+        }
     }
 
     private void drawLastSide(LineDrawer ld, CircleDrawer cd) {
@@ -181,7 +190,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
             }
             repaint();
 //        } else {
-//            if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //размер списка треугольников = 2, вызвать метод сборки новой фигуры
+//        /    if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //размер списка треугольников = 2, вызвать метод сборки новой фигуры
                 if ((triangles.size() == 2) && (triangles.get(0).getList().size() == 3) && (triangles.get(1).getList().size() == 3)) {
                     figure = new Figure(TriangleDrawer.pointsOfNewPolygon(triangles.get(0), triangles.get(1)));
                 }
@@ -220,25 +229,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseDragged(MouseEvent mouseEvent) {
-        if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-            ScreenPoint newPosition = new ScreenPoint(mouseEvent.getX(), mouseEvent.getY());
-            if (prevPoint != null) {
-                ScreenPoint screenDelta = new ScreenPoint(newPosition.getX() - prevPoint.getX(), newPosition.getY() - prevPoint.getY());
-                RealPoint deltaReal = sc.s2r(screenDelta);
-                double vectorX = deltaReal.getX() - sc.getxR();
-                double vectorY = deltaReal.getY() - sc.getyR();
+        ScreenPoint newPosition = new ScreenPoint(mouseEvent.getX(), mouseEvent.getY());
+        if (prevPoint != null) {
+            ScreenPoint screenDelta = new ScreenPoint(newPosition.getX() - prevPoint.getX(), newPosition.getY() - prevPoint.getY());
+            RealPoint deltaReal = sc.s2r(screenDelta);
+            double vectorX = deltaReal.getX() - sc.getxR();
+            double vectorY = deltaReal.getY() - sc.getyR();
 
-                sc.setxR(sc.getxR() - vectorX);
-                sc.setyR(sc.getyR() - vectorY);
-                prevPoint = newPosition;
-                repaint();
-            }
-            if (newLine != null) {
-                newLine.setP2(sc.s2r(newPosition));
-            }
-
+            sc.setxR(sc.getxR() - vectorX);
+            sc.setyR(sc.getyR() - vectorY);
+            prevPoint = newPosition;
             repaint();
         }
+        if (newLine != null) {
+            newLine.setP2(sc.s2r(newPosition));
+        }
+        repaint();
     }
 
 
