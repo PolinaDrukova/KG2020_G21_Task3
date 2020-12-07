@@ -1,4 +1,4 @@
-package com.company.Triangle;
+package com.company.triangle;
 
 import com.company.point.RealPoint;
 

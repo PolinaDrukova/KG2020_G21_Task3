@@ -1,6 +1,6 @@
-package com.company.line_drawer;
+package com.company.lineDrawer;
 
-import com.company.pixel_drawer.PixelDrawer;
+import com.company.pixelDrawer.PixelDrawer;
 import com.company.point.ScreenPoint;
 
 import java.awt.*;

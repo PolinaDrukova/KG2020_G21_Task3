@@ -1,4 +1,4 @@
-package com.company.line_drawer;
+package com.company.lineDrawer;
 
 import com.company.point.ScreenPoint;
 

@@ -1,8 +1,7 @@
-package com.company.Triangle;
+package com.company.triangle;
 
 import com.company.Line;
-import com.company.line_drawer.CircleDrawer;
-import com.company.line_drawer.LineDrawer;
+import com.company.lineDrawer.LineDrawer;
 import com.company.point.RealPoint;
 import com.company.ScreenConverter;
 import com.company.point.ScreenPoint;
@@ -15,26 +14,26 @@ import java.util.List;
 
 public class TriangleDrawer {
 
-    public static void draw(ScreenConverter sc, LineDrawer ld, Triangle t, CircleDrawer cd) {//две стороны треугольника, complete = false
+    public static void drawTriangle(ScreenConverter sc, LineDrawer ld, Triangle t) {//две стороны треугольника, complete = false
         RealPoint prev = null;
-        for (RealPoint p : t.getList()) {
+        for (RealPoint point : t.getList()) {
             if (prev != null) {
                 ScreenPoint p1 = sc.r2s(prev);
-                ScreenPoint p2 = sc.r2s(p);
+                ScreenPoint p2 = sc.r2s(point);
                 ld.drawLine(p1, p2, Color.BLUE);
-                cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
+
             }
-            prev = p;
+            prev = point;
 
         }
     }
 
-    public static void drawFinal(ScreenConverter sc, LineDrawer ld, Triangle t, CircleDrawer cd) {//завершенный треугольник, complete = true
-        draw(sc, ld, t, cd);
+    public static void drawFinalSide(ScreenConverter sc, LineDrawer ld, Triangle t) {//завершенный треугольник, complete = true
+        drawTriangle(sc, ld, t);
         ScreenPoint p1 = sc.r2s(t.getList().get(t.getList().size() - 1));
         ScreenPoint p2 = sc.r2s(t.getList().get(0));
         ld.drawLine(p1, p2, Color.BLUE);
-        cd.drawCircle(p1.getX() - 5, p1.getY() - 5, 5);
+
     }
 
     private static boolean isBelongs(Triangle t, RealPoint p) {//принадлежит ли точка треугольнику
@@ -60,7 +59,7 @@ public class TriangleDrawer {
 
     }
 
-    public static RealPoint getCrossingPoint(Line l1, Line l2) {
+    private static RealPoint getCrossingPoint(Line l1, Line l2) {//поиск точки пересечения двух линий
         double x1 = l1.getP1().getX();
         double y1 = l1.getP1().getY();
         double x2 = l1.getP2().getX();
@@ -72,8 +71,7 @@ public class TriangleDrawer {
         double v1, v2, v3, v4;
         double xv12, xv13, xv14, xv31, xv32, xv34, yv12, yv13, yv14, yv31, yv32, yv34;
 
-        //нахождение координат векторов
-        xv12 = x2 - x1;
+        xv12 = x2 - x1; //координаты векторов
         xv13 = x3 - x1;
         xv14 = x4 - x1;
         yv12 = y2 - y1;
@@ -87,9 +85,7 @@ public class TriangleDrawer {
         yv32 = y2 - y3;
         yv34 = y4 - y3;
 
-        // векторные произведения
-
-        v1 = xv34 * yv31 - yv34 * xv31;
+        v1 = xv34 * yv31 - yv34 * xv31;// векторные произведения
         v2 = xv34 * yv32 - yv34 * xv32;
         v3 = xv12 * yv13 - yv12 * xv13;
         v4 = xv12 * yv14 - yv12 * xv14;
@@ -104,11 +100,11 @@ public class TriangleDrawer {
             C2 = (x3 * (y3 - y4) + y3 * (x4 - x3)) * (-1);
 
 
-            double D = ((A1 * B2) - (B1 * A2));
+            double D = ((A1 * B2) - (B1 * A2));//детерминант
             double Dx = ((C1 * B2) - (B1 * C2));
             double Dy = ((A1 * C2) - (C1 * A2));
 
-            if (D != 0) {
+            if (D != 0) {//поиск неизвестных методом крамера, если детерминант не равен 0
                 double x = (Dx / D);
                 double y = (Dy / D);
                 return new RealPoint(x, y);
@@ -120,7 +116,7 @@ public class TriangleDrawer {
     }
 
 
-    public static List<RealPoint> pointsOfNewPolygon(Triangle t1, Triangle t2) {
+    public static List<RealPoint> pointsOfNewPolygon(Triangle t1, Triangle t2) {//финальная функция
         List<RealPoint> finalPoints = new ArrayList<>();
 
         RealPoint a1 = t1.getList().get(0);
@@ -175,21 +171,20 @@ public class TriangleDrawer {
                 }
             }
 
-            for (int i = 0; i < p1.size(); i++) {
-                for (int j = 0; j < p2.size(); j++) {
-                    if (p1.get(i) == p2.get(j)) {
-                        finalPoints.add(p1.get(i));
+            for (RealPoint realPoint : p1) {
+                for (RealPoint point : p2) {
+                    if (realPoint == point) {
+                        finalPoints.add(realPoint);
                     }
                 }
             }
         }
 
         return sortPoints(finalPoints);
-
     }
 
     //определяет угол по вектору из усредненной точки на каждую вершину и сортирует по углу
-    public static List<RealPoint> sortPoints(List<RealPoint> points) {
+    private static List<RealPoint> sortPoints(List<RealPoint> points) {
 
         float averageX = 0;
         float averageY = 0;
@@ -204,12 +199,12 @@ public class TriangleDrawer {
 
         Comparator<RealPoint> comparator = new Comparator<RealPoint>() {
 
-            public int compare(RealPoint lhs, RealPoint rhs) {
-                double lhsAngle = Math.atan2(lhs.getY() - finalAverageY, lhs.getX() - finalAverageX);
-                double rhsAngle = Math.atan2(rhs.getY() - finalAverageY, rhs.getX() - finalAverageX);
+            public int compare(RealPoint p1, RealPoint p2) {
+                double angle1 = Math.atan2(p1.getY() - finalAverageY, p1.getX() - finalAverageX);
+                double angle2 = Math.atan2(p2.getY() - finalAverageY, p2.getX() - finalAverageX);
 
-                if (lhsAngle < rhsAngle) return -1;
-                if (lhsAngle > rhsAngle) return 1;
+                if (angle1 < angle2) return -1;
+                if (angle1 > angle2) return 1;
 
                 return 0;
             }

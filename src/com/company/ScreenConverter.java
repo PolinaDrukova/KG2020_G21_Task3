@@ -1,6 +1,5 @@
 package com.company;
 
-import com.company.Triangle.TriangleDrawer;
 import com.company.point.RealPoint;
 import com.company.point.ScreenPoint;
 
